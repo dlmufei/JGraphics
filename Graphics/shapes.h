@@ -4,8 +4,7 @@
 #define PI	3.141592654f
 #define PI2	PI*2
 
-extern int	g_cliHeight;
-extern int	g_cliWidth;
+enum shape_type{shape_bezier,shape_circle,shape_cut_in,shape_cut_out,shape_fill,shape_lines,shape_pencil,shape_polygon};
 struct Color
 {
 	Color() {}
@@ -62,10 +61,12 @@ public:
 	virtual void clear() = 0;
 	virtual void eraseLast() {}
 	virtual void update() {}
+	virtual int* output() { return NULL; }
+	virtual void input(int *,int) {}
 	//	virtual void add(float, float, Color, float);
 	//	virtual void 
 	virtual ~PicElem() {};
-
+	shape_type type;
 };
 
 class Points : public PicElem
@@ -119,3 +120,9 @@ private:
 	std::vector<float> m_size;
 };
 
+extern Color** pixels;
+extern std::vector<PicElem*> vec;
+extern Color g_defColor;
+extern Color g_whiteColor;
+extern Color g_blackColor;
+extern Color g_redColor;

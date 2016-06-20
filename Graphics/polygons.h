@@ -1,5 +1,6 @@
 #pragma once
 #include "shapes.h"
+#include "myGL.h"
 
 class Polygons : public PicElem
 {
@@ -50,11 +51,11 @@ public:
 		for (int i = 1; i < m_points.size(); i++) {
 			std::vector<Point> *tmp_points=getPoints(m_points[i - 1], m_points[i]);
 			m_lines.push_back(*tmp_points);
-			setPoints_pixels(tmp_points, m_color);
+			setPoints_pixels(tmp_points, g_defColor);
 		}
 		std::vector<Point> *tmp_points = getPoints(m_points[0], m_points[m_points.size()-1]);
 		m_lines.push_back(*tmp_points);
-		setPoints_pixels(tmp_points, m_color);
+		setPoints_pixels(tmp_points, g_defColor);
 	}
 	void move(int x, int y)
 	{
@@ -103,7 +104,6 @@ public:
 	}
 	void replaceLast(float x, float y)
 	{
-		//std::cout << m_points.size() << " " << m_lines.size() << "\n";
 		if(m_points.size()==m_lines.size()&&m_points.size()>=5)
 			setPoints_pixels(&m_lines[m_lines.size() - 1], g_blackColor);
 		m_points[m_points.size() - 1] = Point(x, y);
@@ -127,9 +127,7 @@ public:
 		}
 		for (int x = 0; x < g_cliWidth; x++) {
 			sort(yIndex[x].begin(), yIndex[x].end());
-			//std::cout << yIndex[x].size() << "\n";
 			for (int i = 0; i+1 < yIndex[x].size() ; i += 2) {
-				//std::cout <<  yIndex[x][i] << " " << yIndex[x][i + 1] << "\n";
 				for (int y = yIndex[x][i]; y <= yIndex[x][i + 1]; y++) {
 					inner_points.push_back(Point(x, y));
 				}
@@ -137,9 +135,29 @@ public:
 		}
 		return inner_points;
 	}
+	int* output() {
+		int size = m_points.size();
+		int* output = new int[2 * size + 2];
+		output[0] = 2 * size + 2;
+		output[1] = type;
+		for (int i = 0; i < size; i++) {
+			output[2 * i + 2] = m_points[i].pnt[0];
+			output[2 * i + 3] = m_points[i].pnt[1];
+		}
+		return output;
+	}
+	void input(int *input, int size) {
+		int cnt = (size - 2) / 2;
+		m_points.clear();
+		for (int i = 0; i < cnt; i++) {
+			m_points.push_back(Point(input[2 * i], input[2 * i + 1]));
+		}
+		update();
+	}
 protected:
 	std::vector<Point> m_points;
 	std::vector<std::vector<Point>> m_lines;
 	Color m_color;
 	float m_width;
+	shape_type type = shape_polygon;
 };

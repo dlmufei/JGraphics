@@ -72,6 +72,26 @@ public:
 		}
 		m_points.push_back(Point(radiusX + centerX, centerY));
 	}
+	int* output() {
+		shape_type type = shape_circle;
+		int size = m_points.size();
+		int* output = new int[2 * size + 1];
+		output[0] = 2 * size + 2;
+		output[1] = type;
+		for (int i = 0; i < size; i++) {
+			output[2 * i + 2] = m_points[i].pnt[0];
+			output[2 * i + 3] = m_points[i].pnt[1];
+		}
+		return output;
+	}
+	void input(int *input, int size) {
+		int cnt = (size - 2) / 2;
+		m_points.clear();
+		for (int i = 0; i < cnt; i++) {
+			m_points.push_back(Point(input[2 * i], input[2 * i + 1]));
+		}
+		update();
+	}
 	virtual void clear() {}
 private:
 	std::vector<Point> m_points;

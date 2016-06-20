@@ -60,6 +60,9 @@
     <ClInclude Include="cube.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="myfile.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -69,6 +72,9 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="Graphics.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="myfile.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

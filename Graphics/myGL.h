@@ -1,5 +1,4 @@
 #pragma once
-#include "common.h"
 #include "shapes.h"
 #include "cube.h"
 
@@ -18,23 +17,4 @@ void setPoints_pixels(Point p1, Point p2, Color color);
 void setPoints_pixels(std::vector<Point> *points, Color color);
 std::vector<Point>* getPoints(Point p1, Point p2);
 void cutPoints_pixels(std::vector<Point> *points);
-
-extern int** pixels_cnt;
-extern Color** pixels;
-extern std::vector<PicElem*> vec;
-extern HDC	g_hdc;
-extern HGLRC g_hRC;
-extern HWND hWnd;
-extern RECT g_clientRect;
-extern int	g_cliHeight;
-extern int	g_cliWidth;
-extern Color g_defColor;
-extern Color g_whiteColor;
-extern Color g_blackColor;
-extern float g_defSize;
-extern GLfloat	g_aspect;
-extern Cube cube;
-
-extern MODE mode;
-extern bool is_lbtn_down;
-extern bool is_rbtn_down;
+void initPixels();

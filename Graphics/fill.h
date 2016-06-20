@@ -1,5 +1,4 @@
 #pragma once
-#include "common.h"
 #include "myGL.h"
 static int DX[] = { -1, 1, 0, 0 };
 static int DY[] = { 0, 0, -1, 1 };
@@ -22,9 +21,7 @@ public:
 				Point p2(p.pnt[0] + DX[k], p.pnt[1] + DY[k]);
 				if (p2.valid() && getColor(p2) == color) {
 					q.push(p2);
-					//p2.draw(g_defColor);
 					pixels[p2.pnt[0]][p2.pnt[1]] = g_defColor;
-					//std::cout << p2.pnt[0] << " " << p2.pnt[1] << "\n";
 				}
 			}
 		}
@@ -47,11 +44,30 @@ public:
 						q.push(p2);
 						p2.draw(g_defColor);
 						pixels[p2.pnt[0]][p2.pnt[1]] = g_defColor;
-						//std::cout << p2.pnt[0] << " " << p2.pnt[1] << "\n";
 					}
 				}
 			}
 		}
+	}
+	int* output() {
+		shape_type type = shape_fill;
+		int size = m_points.size();
+		int* output = new int[2 * size + 2];
+		output[0] = 2 * size + 2;
+		output[1] = type;
+		for (int i = 0; i < size; i++) {
+			output[2 * i + 2] = m_points[i].pnt[0];
+			output[2 * i + 3] = m_points[i].pnt[1];
+		}
+		return output;
+	}
+	void input(int *input, int size) {
+		int cnt = (size - 2) / 2;
+		m_points.clear();
+		for (int i = 0; i < cnt; i++) {
+			add(Point(input[2 * i], input[2 * i + 1]),g_defColor,1);
+		}
+		update();
 	}
 	virtual void add(float, float, float, float, float, float) {};
 	virtual void add(float, float, float, float, float, float, float, float) {};

@@ -55,7 +55,6 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     UNREFERENCED_PARAMETER(lpCmdLine);
 
     // TODO: 在此放置代码。
-	vec.push_back(new Points);
 	vec.push_back(new Lines);
 	
     // 初始化全局字符串
@@ -162,8 +161,9 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     {
 	case WM_CREATE:
 		AllocConsole();
+
 		freopen("conout$", "w", stdout);
-		printf("hello hplonline!-_-\n");
+		
 		GetClientRect(hWnd, &g_clientRect);
 		g_cliWidth = g_clientRect.right - g_clientRect.left;
 		g_cliHeight = g_clientRect.bottom - g_clientRect.top;
@@ -236,6 +236,12 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 				cube.init();
 				InvalidateRect(hWnd, NULL, false);
 				break;
+			case ID_OPEN:
+				readFile();
+				break;
+			case ID_SAVE:
+				saveFile();
+				break;
             default:
                 return DefWindowProc(hWnd, message, wParam, lParam);
             }
@@ -271,7 +277,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		case mode_CUT_IN:
 		{
 			Point pnt(LOWORD(lParam), g_clientRect.bottom - HIWORD(lParam));
-			PicElem* p = new Polygons;
+			PicElem* p = new Cut;
 			p->add(pnt, pnt, g_redColor, g_defSize);
 			p->add(pnt, g_redColor, g_defSize);
 			vec.push_back(p);
@@ -292,7 +298,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		case mode_Bezier:
 		{
 			Point pnt(LOWORD(lParam), g_clientRect.bottom - HIWORD(lParam));
-			PicElem* p = new Bezier(g_whiteColor);
+			PicElem* p = new Bezier();
 			p->add(pnt, pnt, g_defColor, g_defSize);
 			vec.push_back(p);
 			mode = mode_Bezier2;
@@ -316,7 +322,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		{
 
 		case mode_LINES:
-			vec[1]->update();
+			vec[0]->update();
 			break;
 		case mode_Bezier2:
 			addLastPoint(lParam);

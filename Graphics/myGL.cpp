@@ -10,6 +10,9 @@ void createPixels()
 		pixels[i] = new Color[g_cliHeight];
 		pixels_cnt[i] = new int[g_cliHeight];
 	}
+	initPixels();
+}
+void initPixels() {
 	for (int i = 0; i < g_cliWidth; i++) {
 		for (int j = 0; j < g_cliHeight; j++) {
 			pixels[i][j] = g_blackColor;
@@ -78,7 +81,7 @@ void GL_show()
 			case mode_POLYGON:
 				break;
 			case mode_LINES:
-				vec[1]->render();
+				vec[0]->render();
 				break;
 			case mode_POLYGON2:
 			case mode_CIRCLE:
@@ -128,12 +131,12 @@ void addLastPoint(LPARAM param)
 }
 void addLines(LPARAM param1, LPARAM param2)
 {
-	vec[1]->add(Point(LOWORD(param1), g_cliHeight - HIWORD(param1)),
+	vec[0]->add(Point(LOWORD(param1), g_cliHeight - HIWORD(param1)),
 		Point(LOWORD(param2), g_cliHeight - HIWORD(param2)), g_defColor, g_defSize);
 }
 void modifyLastLine(LPARAM param)
 {
-	vec[1]->replaceLast(LOWORD(param), g_cliHeight - HIWORD(param));
+	vec[0]->replaceLast(LOWORD(param), g_cliHeight - HIWORD(param));
 }
 void modifyLastPoint(LPARAM param)
 {
@@ -196,6 +199,7 @@ std::vector<Point>* getPoints(Point p1, Point p2) {
 }
 void setPoints_pixels(Point p1,Point p2,Color color)
 {
+	if ((!p1.valid()) || (!p2.valid())) return;
 	std::vector<Point> *points=getPoints(p1,p2);
 	setPoints_pixels(points, color);
 }
@@ -203,6 +207,7 @@ void cutPoints_pixels(std::vector<Point> *points)
 {
 	for (int i = 0; i < points->size(); i++)
 	{
+		if (!(*points)[i].valid()) continue;
 		int x = (*points)[i].pnt[0];
 		int y = (*points)[i].pnt[1];
 		pixels[x][y] = g_blackColor;
@@ -213,6 +218,7 @@ void setPoints_pixels(std::vector<Point> *points, Color color)
 {
 	for (int i = 0; i < points->size(); i++)
 	{
+		if (!(*points)[i].valid()) continue;
 		int x = (*points)[i].pnt[0];
 		int y = (*points)[i].pnt[1];
 		if (pixels[x][y] == color) pixels_cnt[x][y]++;

@@ -25,5 +25,30 @@ public:
 		m_color = color;
 		m_width = width;
 	};
-
+	void update() {
+		for (int i = 1; i < m_points.size(); i++) {
+			std::vector<Point> *tmp_points = getPoints(m_points[i - 1], m_points[i]);
+			setPoints_pixels(tmp_points, g_defColor);
+		}
+	}
+	int* output() {
+		int size = m_points.size();
+		int* output = new int[2 * size + 2];
+		output[0] = 2 * size + 2;
+		output[1] = type;
+		for (int i = 0; i < size; i++) {
+			output[2 * i + 2] = m_points[i].pnt[0];
+			output[2 * i + 3] = m_points[i].pnt[1];
+		}
+		return output;
+	}
+	void input(int *input, int size) {
+		int cnt = (size - 2) / 2;
+		m_points.clear();
+		for (int i = 0; i < cnt; i++) {
+			m_points.push_back(Point(input[2 * i], input[2 * i + 1]));
+		}
+		update();
+	}
+	shape_type type = shape_pencil;
 };
