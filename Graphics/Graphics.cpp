@@ -27,15 +27,17 @@ Color g_redColor(1, 0, 0);
 float g_defSize = 1.0f;
 wchar_t explain_draw_line[] = L"按下鼠标左键并拖动，松开后完成绘制";
 wchar_t explain_draw_circle[] = L"按下鼠标左键并拖动绘制，松开结束";
-wchar_t explain_draw_polygon[] = L"按下鼠标左键确定起点，然后依次按下各个顶点，期间可按住拖动，点击鼠标右键结束绘制。";
+wchar_t explain_draw_polygon[] = L"按下鼠标左键并拖动，松开时确定第一条边，然后按下鼠标左键并拖动，松开时确定下一个顶点，点击鼠标右键结束绘制。";
 wchar_t explain_draw_bezier[] = L"依次点击各个点，期间可按住拖动，点击鼠标右键结束绘制。";
 wchar_t explain_fill[] = L"点击待填充的区域即可";
 wchar_t error_move[] = L"请先绘制一个多边形";
-wchar_t explain_move[] = L"按下左键拖动平移";
+wchar_t explain_move[] = L"按下左键拖动平移，按下右键拖动旋转与放缩";
 std::vector<PicElem*> vec;
 MODE mode = mode_PENCIL;
 bool is_lbtn_down = false;
+bool is_rbtn_down = false;
 Point lastPoint(0,0);
+Cube cube;
 // 此代码模块中包含的函数的前向声明: 
 ATOM                MyRegisterClass(HINSTANCE hInstance);
 BOOL                InitInstance(HINSTANCE, int);
@@ -87,7 +89,6 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
     return (int) msg.wParam;
 }
-
 
 
 //
@@ -175,6 +176,9 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     case WM_COMMAND:
         {
             int wmId = LOWORD(wParam);
+			if (mode == mode_CUBE) {
+				cube.finish();
+			}
             // 分析菜单选择: 
             switch (wmId)
             {
@@ -227,9 +231,15 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 					mode = mode_MOVE;
 				}
 				break;
+			case ID_CUBE:
+				mode = mode_CUBE;
+				cube.init();
+				InvalidateRect(hWnd, NULL, false);
+				break;
             default:
                 return DefWindowProc(hWnd, message, wParam, lParam);
             }
+			InvalidateRect(hWnd, NULL, false);
         }
         break;
 	case WM_LBUTTONDOWN:
@@ -295,6 +305,9 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		case mode_MOVE:
 			lastPoint = Point(LOWORD(lParam), g_clientRect.bottom - HIWORD(lParam));
 			break;
+		case mode_CUBE:
+			lastPoint = Point(LOWORD(lParam), g_clientRect.bottom - HIWORD(lParam));
+			break;
 		}
 		break;
 	case WM_LBUTTONUP:
@@ -326,6 +339,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		InvalidateRect(hWnd, NULL, false);
 		break;
 	case WM_RBUTTONDOWN:
+		is_rbtn_down = true;
 		switch (mode)
 		{
 		case mode_CUT_IN2:
@@ -343,31 +357,63 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			mode = mode_Bezier;
 			vec[vec.size() - 1]->update();
 			break;
+		case mode_MOVE:
+			lastPoint = Point(LOWORD(lParam), g_clientRect.bottom - HIWORD(lParam));
+			((Polygons*)vec[vec.size() - 1])->clear();
+			break;
 		default:
 			break;
 		}
 		InvalidateRect(hWnd, NULL, false);
 		break;
+	case WM_RBUTTONUP:
+		is_rbtn_down = false;
+		if(mode==mode_MOVE) vec[vec.size() - 1]->update();
+		break;
 	case WM_MOUSEMOVE:
-		if (!is_lbtn_down) break;
-		switch (mode) {
-		case mode_PENCIL:addLastPoint(lParam); break;
-		case mode_LINES:modifyLastLine(lParam); break;
-		case mode_CUT_OUT2:
-		case mode_CUT_IN2:
-		case mode_Bezier2:
-		case mode_POLYGON2:
-		case mode_CIRCLE: modifyLastPoint(lParam); break;
-		case mode_MOVE:
-		{
-			Point p(LOWORD(lParam), g_clientRect.bottom - HIWORD(lParam));
-			((Polygons*)vec[vec.size() - 1])->move(p.pnt[0] - lastPoint.pnt[0], p.pnt[1] - lastPoint.pnt[1]);
-			lastPoint = p;
-			break;
+		if (is_lbtn_down) {
+			switch (mode) {
+			case mode_PENCIL:addLastPoint(lParam); break;
+			case mode_LINES:modifyLastLine(lParam); break;
+			case mode_CUT_OUT2:
+			case mode_CUT_IN2:
+			case mode_Bezier2:
+			case mode_POLYGON2:
+			case mode_CIRCLE: modifyLastPoint(lParam); break;
+			case mode_MOVE:
+			{
+				Point p(LOWORD(lParam), g_clientRect.bottom - HIWORD(lParam));
+				((Polygons*)vec[vec.size() - 1])->move(p.pnt[0] - lastPoint.pnt[0], p.pnt[1] - lastPoint.pnt[1]);
+				lastPoint = p;
+				break;
+			}
+			case mode_CUBE:
+			{
+				Point p(LOWORD(lParam), g_clientRect.bottom - HIWORD(lParam));
+				cube.rotate(lastPoint, p);
+				lastPoint = p;
+				break;
+			}
+			default:break;
+			}
+			InvalidateRect(hWnd, NULL, false);
 		}
-		default:break;
+		if (is_rbtn_down) {
+			switch (mode)
+			{
+			case mode_MOVE:
+			{
+				Point p(LOWORD(lParam), g_clientRect.bottom - HIWORD(lParam));
+				//double angle = (double)(p.pnt[0] - lastPoint.pnt[0] + p.pnt[1] - lastPoint.pnt[1])/(g_cliHeight+g_cliWidth)*PI2;
+				((Polygons*)vec[vec.size() - 1])->rotation(lastPoint,p);
+				lastPoint = p;
+				break;
+			}
+			default:
+				break;
+			}
+			InvalidateRect(hWnd, NULL, false);
 		}
-		InvalidateRect(hWnd, NULL, false);
 		break;
 	case WM_SIZE:
 	{

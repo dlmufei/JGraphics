@@ -38,12 +38,15 @@ public:
 		//m_color = color;
 		//m_width = width;
 	};
-	void update() {
+	void clear() {
 		for (int i = 0; i < m_lines.size(); i++) {
 			setPoints_pixels(&m_lines[i], g_blackColor);
 			m_lines[i].clear();
 		}
 		m_lines.clear();
+	}
+	void update() {
+		clear();
 		for (int i = 1; i < m_points.size(); i++) {
 			std::vector<Point> *tmp_points=getPoints(m_points[i - 1], m_points[i]);
 			m_lines.push_back(*tmp_points);
@@ -58,6 +61,44 @@ public:
 		for (int i = 0; i < m_points.size(); i++) {
 			m_points[i].pnt[0] += x;
 			m_points[i].pnt[1] += y;
+		}
+	}
+	void rotation(Point last, Point newP) {
+		double o_x = 0, o_y = 0;
+		for (int i = 0; i < m_points.size(); i++) {
+			o_x += m_points[i].pnt[0];
+			o_y += m_points[i].pnt[1];
+		}
+		o_x /= m_points.size();
+		o_y /= m_points.size();
+		double x0 = last.pnt[0]-o_x;
+		double y0 = last.pnt[1]-o_y;
+		double x1 = newP.pnt[0]-o_x;
+		double y1 = newP.pnt[1]-o_y;
+		double s = (x1*y0 - x0*y1) / (x0*x0 + y0*y0);
+		double c = (x0*x1 + y0*y1) / (x0*x0 + y0*y0);
+		for (int i = 0; i < m_points.size(); i++) {
+			double x0 = m_points[i].pnt[0], y0 = m_points[i].pnt[1];
+			x0 -= o_x;
+			y0 -= o_y;
+			m_points[i].pnt[0] = (int)round(x0*c + y0*s + o_x);
+			m_points[i].pnt[1] = (int)round(-x0*s + y0*c + o_y);
+		}
+	}
+	void rotation(double angle) {
+		double o_x = 0, o_y = 0;
+		for (int i = 0; i < m_points.size(); i++) {
+			o_x += m_points[i].pnt[0];
+			o_y += m_points[i].pnt[1];
+		}
+		o_x /= m_points.size();
+		o_y /= m_points.size();
+		for (int i = 0; i < m_points.size(); i++) {
+			double x0 = m_points[i].pnt[0], y0 = m_points[i].pnt[1];
+			x0 -= o_x;
+			y0 -= o_y;
+			m_points[i].pnt[0] = (int)round(x0*cos(angle) + y0*sin(angle)+o_x);
+			m_points[i].pnt[1] = (int)round(-x0*sin(angle) + y0*cos(angle)+o_y);
 		}
 	}
 	void replaceLast(float x, float y)
@@ -96,7 +137,6 @@ public:
 		}
 		return inner_points;
 	}
-	virtual void clear() {}
 protected:
 	std::vector<Point> m_points;
 	std::vector<std::vector<Point>> m_lines;

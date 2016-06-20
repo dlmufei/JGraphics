@@ -57,56 +57,64 @@ void resize_Viewport(GLsizei w, GLsizei h)
 	glViewport(0, 0, w, h);
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
-	glOrtho(0, g_clientRect.right, 0, g_clientRect.bottom, 10.0f, -10.0f);
-	glMatrixMode(GL_MODELVIEW);
-	glLoadIdentity();
-	gluLookAt(0, 0, 8.0f, 0, 0, 0, 0, 1, 0);
+	glOrtho(0, g_clientRect.right, 0, g_clientRect.bottom, -h, h);
+	//gluPerspective(fovy,aspect,zNear,zFaar)
+	//glMatrixMode(GL_MODELVIEW);
+	//glLoadIdentity();
+	//gluLookAt(0, 0, 8.0f, 0, 0, 0, 0, 1, 0);
 }
 void GL_show()
 {
 
-	glClear(GL_COLOR_BUFFER_BIT);
+	glClear(GL_COLOR_BUFFER_BIT| GL_DEPTH_BUFFER_BIT);
 	glPushMatrix();
-
-	if (is_lbtn_down) {
-		switch (mode)
-		{
-		case mode_POLYGON:
-			break;
-		case mode_LINES:
-			vec[1]->render();
-			break;
-		case mode_POLYGON2:
-		case mode_CIRCLE:
-		case mode_Bezier:
-		case mode_Bezier2:
-		case mode_CUT_IN2:
-		case mode_CUT_OUT2:
-		case mode_MOVE:
-			vec[vec.size() - 1]->render();
-			break;
-		case mode_Fill:
-			break;
-		default:
-			break;
-		}
+	if (mode == mode_CUBE) {
+		cube.render();
 	}
-	glColor3fv(g_defColor.color);
-	glBegin(GL_POINTS);
-	for (int i = 0; i < g_cliWidth; i++) {
-		for (int j = 0; j < g_cliHeight; j++) {
-			if (pixels[i][j] == g_blackColor)
-				continue;
-			else if(pixels[i][j]==g_defColor)
-				glVertex2i(i, j);
-			else {
-				glColor3fv(pixels[i][j].color);
-				glVertex2i(i, j);
-				glColor3fv(g_defColor.color);
+	else {
+		if (is_lbtn_down) {
+			switch (mode)
+			{
+			case mode_POLYGON:
+				break;
+			case mode_LINES:
+				vec[1]->render();
+				break;
+			case mode_POLYGON2:
+			case mode_CIRCLE:
+			case mode_Bezier:
+			case mode_Bezier2:
+			case mode_CUT_IN2:
+			case mode_CUT_OUT2:
+			case mode_MOVE:
+				vec[vec.size() - 1]->render();
+				break;
+			case mode_Fill:
+				break;
+			default:
+				break;
 			}
 		}
+		if (is_rbtn_down) {
+			if (mode == mode_MOVE) vec[vec.size() - 1]->render();
+		}
+		glColor3fv(g_defColor.color);
+		glBegin(GL_POINTS);
+		for (int i = 0; i < g_cliWidth; i++) {
+			for (int j = 0; j < g_cliHeight; j++) {
+				if (pixels[i][j] == g_blackColor)
+					continue;
+				else if (pixels[i][j] == g_defColor)
+					glVertex2i(i, j);
+				else {
+					glColor3fv(pixels[i][j].color);
+					glVertex2i(i, j);
+					glColor3fv(g_defColor.color);
+				}
+			}
+		}
+		glEnd();
 	}
-	glEnd();
 	glFlush();
 	glPopMatrix();
 	
@@ -198,6 +206,7 @@ void cutPoints_pixels(std::vector<Point> *points)
 		int x = (*points)[i].pnt[0];
 		int y = (*points)[i].pnt[1];
 		pixels[x][y] = g_blackColor;
+		pixels_cnt[x][y] = 1;
 	}
 }
 void setPoints_pixels(std::vector<Point> *points, Color color)
@@ -211,6 +220,9 @@ void setPoints_pixels(std::vector<Point> *points, Color color)
 			if(pixels_cnt[x][y]==1) pixels[x][y] = color;
 			else pixels_cnt[x][y]--;
 		}
-		else pixels[x][y] = color;
+		else {
+			pixels_cnt[x][y] = 1;
+			pixels[x][y] = color;
+		}
 	}
 }

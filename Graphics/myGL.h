@@ -1,6 +1,7 @@
 #pragma once
 #include "common.h"
 #include "shapes.h"
+#include "cube.h"
 
 void GLOnCreate();
 void GL_show();
@@ -32,6 +33,8 @@ extern Color g_whiteColor;
 extern Color g_blackColor;
 extern float g_defSize;
 extern GLfloat	g_aspect;
+extern Cube cube;
 
 extern MODE mode;
-extern bool is_lbtn_down ;
+extern bool is_lbtn_down;
+extern bool is_rbtn_down;
