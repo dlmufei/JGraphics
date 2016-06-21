@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "myfile.h"
-
+const int magic_num = 19950929;
 void readFile()
 {
 	OPENFILENAME opfn;
@@ -33,24 +33,26 @@ void readFile()
 		NULL);                 // 模板文件为空。
 	if (hFile == INVALID_HANDLE_VALUE)
 	{
-		std::cout << "创建文件失败\n";
 	}
 	DWORD dwReadSize = 0;
+	int num;
+	BOOL bRet = ::ReadFile(hFile, &num, 4, &dwReadSize, NULL);
+	if (num != magic_num) {
+		CloseHandle(hFile);
+		MessageBox(hWnd, L"不可识别的文件", L"ERROR", MB_OK);
+		return;
+	}
 	vec.clear();
 	initPixels();
 	while(true){
 		int size;
 		BOOL bRet = ::ReadFile(hFile, &size, 4, &dwReadSize, NULL);
-		std::cout << "addr" << dwReadSize << "\n";
 		if (dwReadSize==0) break;
 		shape_type thistype;
 		bRet=::ReadFile(hFile, &thistype, 4, &dwReadSize, NULL);
-		std::cout << "addr" << dwReadSize << "\n";
-		std::cout << "type"<<thistype << "\n";
 		int* input = new int[4 * (size-2)];
 		if (size > 2) {
 			bRet = ::ReadFile(hFile, input, 4 * (size - 2), &dwReadSize, NULL);
-			std::cout << "addr" << dwReadSize << "\n";
 		}
 		PicElem* p=NULL;
 		switch (thistype)
@@ -133,9 +135,9 @@ void saveFile()
 		NULL);                 // 模板文件为空。
 	if (hFile == INVALID_HANDLE_VALUE)
 	{
-		std::cout << "创建文件失败\n";
 	}
 	DWORD dwWritenSize = 0;
+	::WriteFile(hFile, &magic_num, 4, &dwWritenSize, NULL);
 	for (int i = 0; i < vec.size(); i++) {
 		int* output = vec[i]->output();
 		if (output == NULL) continue;
@@ -143,7 +145,6 @@ void saveFile()
 		BOOL bRet = ::WriteFile(hFile, output, 4 * size, &dwWritenSize, NULL);
 		if (bRet)
 		{
-			std::cout << "WriteFile 写文件成功\r\n";
 		}
 	}
 	FlushFileBuffers(hFile);

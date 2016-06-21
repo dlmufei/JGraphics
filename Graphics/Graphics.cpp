@@ -28,10 +28,12 @@ float g_defSize = 1.0f;
 wchar_t explain_draw_line[] = L"按下鼠标左键并拖动，松开后完成绘制";
 wchar_t explain_draw_circle[] = L"按下鼠标左键并拖动绘制，松开结束";
 wchar_t explain_draw_polygon[] = L"按下鼠标左键并拖动，松开时确定第一条边，然后按下鼠标左键并拖动，松开时确定下一个顶点，点击鼠标右键结束绘制。";
-wchar_t explain_draw_bezier[] = L"依次点击各个点，期间可按住拖动，点击鼠标右键结束绘制。";
+wchar_t explain_draw_bezier[] = L"按下鼠标左键并拖动，松开时确定第一第二个点，继续按下鼠标左键并拖动，确定下一个顶点，点击鼠标右键结束绘制。";
 wchar_t explain_fill[] = L"点击待填充的区域即可";
 wchar_t error_move[] = L"请先绘制一个多边形";
 wchar_t explain_move[] = L"按下左键拖动平移，按下右键拖动旋转与放缩";
+wchar_t explain_cut[] = L"按下鼠标左键并拖动绘制多边形，按下鼠标右键进行裁剪";
+wchar_t explain_cube[] = L"按下鼠标左键拖动旋转";
 std::vector<PicElem*> vec;
 MODE mode = mode_PENCIL;
 bool is_lbtn_down = false;
@@ -160,9 +162,9 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     switch (message)
     {
 	case WM_CREATE:
-		AllocConsole();
+		//AllocConsole();
 
-		freopen("conout$", "w", stdout);
+		//freopen("conout$", "w", stdout);
 		
 		GetClientRect(hWnd, &g_clientRect);
 		g_cliWidth = g_clientRect.right - g_clientRect.left;
@@ -185,6 +187,9 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             case IDM_ABOUT:
                 DialogBox(hInst, MAKEINTRESOURCE(IDD_ABOUTBOX), hWnd, About);
                 break;
+			case ID_EXPLAIN:
+				DialogBox(hInst, MAKEINTRESOURCE(IDD_EXPLAIN), hWnd, About);
+				break;
             case IDM_EXIT:
                 DestroyWindow(hWnd);
                 break;
@@ -213,9 +218,11 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 				break;
 			}
 			case ID_CUT_IN:
+				MessageBox(hWnd, explain_cut, L"Tips", MB_OK);
 				mode = mode_CUT_IN;
 				break;
 			case ID_CUT_OUT:
+				MessageBox(hWnd, explain_cut, L"Tips", MB_OK);
 				mode = mode_CUT_OUT;
 				break;
 			case ID_PENCIL:
@@ -232,6 +239,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 				}
 				break;
 			case ID_CUBE:
+				MessageBox(hWnd, explain_cube, L"Tips", MB_OK);
 				mode = mode_CUBE;
 				cube.init();
 				InvalidateRect(hWnd, NULL, false);
@@ -241,6 +249,10 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 				break;
 			case ID_SAVE:
 				saveFile();
+				break;
+			case ID_CLEAR:
+				vec.clear();
+				initPixels();
 				break;
             default:
                 return DefWindowProc(hWnd, message, wParam, lParam);
