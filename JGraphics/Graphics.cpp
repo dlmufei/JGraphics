@@ -161,8 +161,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     switch (message)
     {
 	case WM_CREATE:
-		AllocConsole();
-		freopen("conout$", "w", stdout);
+		//AllocConsole();
+		//freopen("conout$", "w", stdout);
 		
 		GetClientRect(hWnd, &g_clientRect);
 		g_cliWidth = g_clientRect.right - g_clientRect.left;

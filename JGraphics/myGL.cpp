@@ -210,8 +210,8 @@ void cutPoints_pixels(std::vector<Point> *points)
 	for (unsigned int i = 0; i < points->size(); i++)
 	{
 		if (!(*points)[i].valid()) continue;
-		int x = (*points)[i].pnt[0];
-		int y = (*points)[i].pnt[1];
+		int x = (int)round((*points)[i].pnt[0]);
+		int y = (int)round((*points)[i].pnt[1]);
 		pixels[x][y] = g_blackColor;
 		pixels_cnt[x][y] = 1;
 	}
@@ -221,13 +221,13 @@ void setPoints_pixels(std::vector<Point> *points, Color color)
 	for (unsigned int i = 0; i < points->size(); i++)
 	{
 		if (!(*points)[i].valid()) continue;
-		int x = (*points)[i].pnt[0];
-		int y = (*points)[i].pnt[1];
+		int x = (int)round((*points)[i].pnt[0]);
+		int y = (int)round((*points)[i].pnt[1]);
 		setPoints_pixels(x, y, color);
 	}
 }
 void setPoints_pixels(Point p, Color color) {
-	setPoints_pixels(p.pnt[0], p.pnt[1], color);
+	setPoints_pixels((int)round(p.pnt[0]), (int)round(p.pnt[1]), color);
 }
 void setPoints_pixels(int x, int y, Color color) {
 	//for (int i = 0; i < testp.size(); i++) {
