@@ -42,17 +42,19 @@ void readFile()
 		MessageBox(hWnd, L"不可识别的文件", L"ERROR", MB_OK);
 		return;
 	}
-	vec.clear();
-	initPixels();
+	clear();
 	while(true){
-		int size;
+		float size;
 		BOOL bRet = ::ReadFile(hFile, &size, 4, &dwReadSize, NULL);
+		int i_size = (int)round(size);
 		if (dwReadSize==0) break;
 		shape_type thistype;
-		bRet=::ReadFile(hFile, &thistype, 4, &dwReadSize, NULL);
-		int* input = new int[4 * (size-2)];
+		float tmp;
+		bRet=::ReadFile(hFile, &tmp, 4, &dwReadSize, NULL);
+		thistype = (shape_type)(int)round(tmp);
+		float* input = new float[4 * (i_size-2)];
 		if (size > 2) {
-			bRet = ::ReadFile(hFile, input, 4 * (size - 2), &dwReadSize, NULL);
+			bRet = ::ReadFile(hFile, input, 4 * (i_size - 2), &dwReadSize, NULL);
 		}
 		PicElem* p=NULL;
 		switch (thistype)
@@ -138,10 +140,10 @@ void saveFile()
 	}
 	DWORD dwWritenSize = 0;
 	::WriteFile(hFile, &magic_num, 4, &dwWritenSize, NULL);
-	for (int i = 0; i < vec.size(); i++) {
-		int* output = vec[i]->output();
+	for (unsigned int i = 0; i < vec.size(); i++) {
+		float* output = vec[i]->output();
 		if (output == NULL) continue;
-		int size = output[0];
+		int size = (int)round(output[0]);
 		BOOL bRet = ::WriteFile(hFile, output, 4 * size, &dwWritenSize, NULL);
 		if (bRet)
 		{

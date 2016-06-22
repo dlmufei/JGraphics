@@ -20,17 +20,17 @@ public:
 	{
 		is_cutted = 1;
 		std::vector<Point> points = inner_points();
-		for (int i = 0; i < points.size(); i++) {
-			int x = points[i].pnt[0];
-			int y = points[i].pnt[1];
+		for (unsigned int i = 0; i < points.size(); i++) {
+			int x = (int)round(points[i].pnt[0]);
+			int y = (int)round(points[i].pnt[1]);
 			pixels_cnt[x][y] += 1000;
 		}
-		for (int i = 0; i < m_lines.size(); i++) {
+		for (unsigned int i = 0; i < m_lines.size(); i++) {
 			cutPoints_pixels(&m_lines[i]);
 		}
 		for (int i = 0; i < g_cliWidth; i++) {
 			for (int j = 0; j < g_cliHeight; j++) {
-				if (pixels_cnt[i][j] < 900) {
+				if (pixels_cnt[i][j] < 1000) {
 					pixels[i][j] = g_blackColor;
 				}
 				else {
@@ -41,7 +41,7 @@ public:
 	}
 	void update() {
 		clear();
-		for (int i = 1; i < m_points.size(); i++) {
+		for (unsigned int i = 1; i < m_points.size(); i++) {
 			std::vector<Point> *tmp_points = getPoints(m_points[i - 1], m_points[i]);
 			m_lines.push_back(*tmp_points);
 			setPoints_pixels(tmp_points, g_redColor);
@@ -54,9 +54,9 @@ public:
 			else cut_outside();
 		}
 	}
-	int* output() {
+	float* output() {
 		int size = m_points.size();
-		int* output = new int[2 * size + 2];
+		float* output = new float[2 * size + 2];
 		output[0] = 2 * size + 2;
 		output[1] = type;
 		for (int i = 0; i < size; i++) {
@@ -65,7 +65,7 @@ public:
 		}
 		return output;
 	}
-	void input(int *input, int size) {
+	void input(float *input, int size) {
 		is_cutted = 1;
 		int cnt = (size - 2) / 2;
 		m_points.clear();

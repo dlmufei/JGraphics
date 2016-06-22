@@ -26,7 +26,7 @@ struct Color
 class Point
 {
 public:
-	Point(int vx, int vy)
+	Point(float vx, float vy)
 	{
 		pnt[0] = vx;
 		pnt[1] = vy;
@@ -35,7 +35,7 @@ public:
 	{
 		glColor3fv(color.color);
 		glBegin(GL_POINTS);
-		glVertex2iv(pnt);
+		glVertex2fv(pnt);
 		glEnd();
 	}
 	bool valid()
@@ -44,7 +44,7 @@ public:
 		if (pnt[1] < 0 || pnt[1] >= g_cliWidth) return false;
 		return true;
 	}
-	int pnt[2];
+	float pnt[2];
 };
 
 
@@ -61,8 +61,8 @@ public:
 	virtual void clear() = 0;
 	virtual void eraseLast() {}
 	virtual void update() {}
-	virtual int* output() { return NULL; }
-	virtual void input(int *,int) {}
+	virtual float* output() { return NULL; }
+	virtual void input(float *,int) {}
 	//	virtual void add(float, float, Color, float);
 	//	virtual void 
 	virtual ~PicElem() {};
@@ -80,7 +80,7 @@ public:
 			glPointSize(m_size[i]);
 			glColor3fv(m_colors[i].color);
 			glBegin(GL_POINTS);
-			glVertex2iv(m_points[i].pnt);
+			glVertex2fv(m_points[i].pnt);
 			glEnd();
 		}
 	}

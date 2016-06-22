@@ -13,15 +13,15 @@ public:
 		glLineWidth(m_width);
 		glColor3fv(g_whiteColor.color);
 		glBegin(GL_LINE_STRIP);
-		for (int i = 0; i < m_points.size(); i++) {
-			glVertex2iv(m_points[i].pnt);
+		for (unsigned int i = 0; i < m_points.size(); i++) {
+			glVertex2fv(m_points[i].pnt);
 		}
 		glEnd();
 		glColor3fv(m_color.color);
 		glBegin(GL_LINE_STRIP);
 		for (double t = 0; t < 1; t += STEP) {
 			Point p = getBezierPoint(t);
-			glVertex2iv(p.pnt);
+			glVertex2fv(p.pnt);
 			tmp = p;
 		}
 		glEnd();
@@ -57,7 +57,7 @@ public:
 		}
 		Point tmp = m_points[0];
 		std::vector<Point> *tmp_points;
-		for (int i = 1; i < m_points.size(); i++) {
+		for (unsigned int i = 1; i < m_points.size(); i++) {
 			tmp_points = getPoints(m_points[i - 1], m_points[i]);
 			line_points.insert(line_points.begin(), tmp_points->begin(), tmp_points->end());
 		}
@@ -71,10 +71,10 @@ public:
 		setPoints_pixels(&line_points, g_whiteColor);
 		setPoints_pixels(&bezier_points, g_defColor);
 	}
-	int* output() {
+	float* output() {
 		shape_type type = shape_bezier;
 		int size = m_points.size();
-		int* output = new int[2*size + 2];
+		float* output = new float[2*size + 2];
 		output[0] = 2 * size+2;
 		output[1] = type;
 		for (int i = 0; i < size; i++) {
@@ -83,7 +83,7 @@ public:
 		}
 		return output;
 	}
-	void input(int *input,int size) {
+	void input(float *input,int size) {
 		int cnt = (size - 2) / 2;
 		m_points.clear();
 		for (int i = 0; i < cnt; i++) {

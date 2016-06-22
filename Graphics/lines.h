@@ -14,8 +14,8 @@ public:
 			glLineWidth(m_width[i]);
 			glColor3fv(m_colors[i].color);
 			glBegin(GL_LINES);
-			glVertex2iv(m_point1[i].pnt);
-			glVertex2iv(m_point2[i].pnt);
+			glVertex2fv(m_point1[i].pnt);
+			glVertex2fv(m_point2[i].pnt);
 			glEnd();
 		}
 	}
@@ -40,7 +40,7 @@ public:
 	}
 	void update()
 	{
-		for (int i = 0; i < m_point1.size(); i++) {
+		for (unsigned int i = 0; i < m_point1.size(); i++) {
 			setPoints_pixels(m_point1[i], m_point2[i], g_defColor);
 		}
 	}
@@ -59,9 +59,9 @@ public:
 		m_colors.erase(m_colors.end() - 1);
 		m_width.erase(m_width.end() - 1);
 	}
-	int* output() {
+	float* output() {
 		int size = m_point1.size();
-		int* output = new int[4 * size + 2];
+		float* output = new float[4 * size + 2];
 		output[0] = 4 * size + 2;
 		output[1] = type;
 		for (int i = 0; i < size; i++) {
@@ -72,7 +72,7 @@ public:
 		}
 		return output;
 	}
-	void input(int *input, int size) {
+	void input(float *input, int size) {
 		int cnt = (size - 2) / 4;
 		m_point1.clear();
 		m_point2.clear();

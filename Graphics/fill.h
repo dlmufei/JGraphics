@@ -21,13 +21,13 @@ public:
 				Point p2(p.pnt[0] + DX[k], p.pnt[1] + DY[k]);
 				if (p2.valid() && getColor(p2) == color) {
 					q.push(p2);
-					pixels[p2.pnt[0]][p2.pnt[1]] = g_defColor;
+					setPoints_pixels(p2, g_defColor);
 				}
 			}
 		}
 	}
 	void render() {
-		for (int i = 0; i < m_points.size(); i++) {
+		for (unsigned int i = 0; i < m_points.size(); i++) {
 			Point p = m_points[i];
 			Color color = getColor(p);
 			if (g_defColor == color) return;
@@ -43,16 +43,16 @@ public:
 					if (p2.valid()&&getColor(p2) == color) {
 						q.push(p2);
 						p2.draw(g_defColor);
-						pixels[p2.pnt[0]][p2.pnt[1]] = g_defColor;
+						pixels[(int)round(p2.pnt[0])][(int)round(p2.pnt[1])] = g_defColor;
 					}
 				}
 			}
 		}
 	}
-	int* output() {
+	float* output() {
 		shape_type type = shape_fill;
 		int size = m_points.size();
-		int* output = new int[2 * size + 2];
+		float* output = new float[2 * size + 2];
 		output[0] = 2 * size + 2;
 		output[1] = type;
 		for (int i = 0; i < size; i++) {
@@ -61,7 +61,7 @@ public:
 		}
 		return output;
 	}
-	void input(int *input, int size) {
+	void input(float *input, int size) {
 		int cnt = (size - 2) / 2;
 		m_points.clear();
 		for (int i = 0; i < cnt; i++) {

@@ -11,9 +11,9 @@ public:
 		glLineWidth(m_width);
 		glColor3fv(m_color.color);
 		glBegin(GL_LINE_STRIP);
-		for (int i = 1; i < m_points.size(); ++i)
+		for (unsigned int i = 1; i < m_points.size(); ++i)
 		{
-			glVertex2iv(m_points[i].pnt);
+			glVertex2fv(m_points[i].pnt);
 		}
 		glEnd();
 	}
@@ -43,7 +43,7 @@ public:
 		setPoints_pixels(&circle_points, g_blackColor);
 		circle_points.clear();
 		std::vector<Point> *tmp;
-		for (int i = 2; i < m_points.size(); ++i)
+		for (unsigned int i = 2; i < m_points.size(); ++i)
 		{
 			tmp = getPoints(m_points[i], m_points[i - 1]);
 			circle_points.insert(circle_points.begin(), tmp->begin(), tmp->end());
@@ -72,10 +72,10 @@ public:
 		}
 		m_points.push_back(Point(radiusX + centerX, centerY));
 	}
-	int* output() {
+	float* output() {
 		shape_type type = shape_circle;
 		int size = m_points.size();
-		int* output = new int[2 * size + 1];
+		float* output = new float[2 * size + 1];
 		output[0] = 2 * size + 2;
 		output[1] = type;
 		for (int i = 0; i < size; i++) {
@@ -84,7 +84,7 @@ public:
 		}
 		return output;
 	}
-	void input(int *input, int size) {
+	void input(float *input, int size) {
 		int cnt = (size - 2) / 2;
 		m_points.clear();
 		for (int i = 0; i < cnt; i++) {

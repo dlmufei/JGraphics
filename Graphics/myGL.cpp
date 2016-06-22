@@ -1,7 +1,9 @@
 #include "stdafx.h"
 #include "myGL.h"
+#include "lines.h"
 Color** pixels;
 int** pixels_cnt;
+//std::vector<Point> testp;
 void createPixels()
 {
 	pixels = new Color*[g_cliWidth];
@@ -22,7 +24,7 @@ void initPixels() {
 }
 Color getColor(Point p)
 {
-	return pixels[p.pnt[0]][p.pnt[1]];
+	return pixels[(int)round(p.pnt[0])][(int)round(p.pnt[1])];
 }
 void GLOnCreate()
 {
@@ -75,6 +77,22 @@ void GL_show()
 		cube.render();
 	}
 	else {
+		glColor3fv(g_defColor.color);
+		glBegin(GL_POINTS);
+		for (int i = 0; i < g_cliWidth; i++) {
+			for (int j = 0; j < g_cliHeight; j++) {
+				if (pixels[i][j] == g_blackColor)
+					continue;
+				else if (pixels[i][j] == g_defColor)
+					glVertex2i(i, j);
+				else {
+					glColor3fv(pixels[i][j].color);
+					glVertex2i(i, j);
+					glColor3fv(g_defColor.color);
+				}
+			}
+		}
+		glEnd();
 		if (is_lbtn_down) {
 			switch (mode)
 			{
@@ -101,22 +119,6 @@ void GL_show()
 		if (is_rbtn_down) {
 			if (mode == mode_MOVE) vec[vec.size() - 1]->render();
 		}
-		glColor3fv(g_defColor.color);
-		glBegin(GL_POINTS);
-		for (int i = 0; i < g_cliWidth; i++) {
-			for (int j = 0; j < g_cliHeight; j++) {
-				if (pixels[i][j] == g_blackColor)
-					continue;
-				else if (pixels[i][j] == g_defColor)
-					glVertex2i(i, j);
-				else {
-					glColor3fv(pixels[i][j].color);
-					glVertex2i(i, j);
-					glColor3fv(g_defColor.color);
-				}
-			}
-		}
-		glEnd();
 	}
 	glFlush();
 	glPopMatrix();
@@ -205,7 +207,7 @@ void setPoints_pixels(Point p1,Point p2,Color color)
 }
 void cutPoints_pixels(std::vector<Point> *points)
 {
-	for (int i = 0; i < points->size(); i++)
+	for (unsigned int i = 0; i < points->size(); i++)
 	{
 		if (!(*points)[i].valid()) continue;
 		int x = (*points)[i].pnt[0];
@@ -216,19 +218,66 @@ void cutPoints_pixels(std::vector<Point> *points)
 }
 void setPoints_pixels(std::vector<Point> *points, Color color)
 {
-	for (int i = 0; i < points->size(); i++)
+	for (unsigned int i = 0; i < points->size(); i++)
 	{
 		if (!(*points)[i].valid()) continue;
 		int x = (*points)[i].pnt[0];
 		int y = (*points)[i].pnt[1];
-		if (pixels[x][y] == color) pixels_cnt[x][y]++;
-		else if (color == g_blackColor) {
-			if(pixels_cnt[x][y]==1) pixels[x][y] = color;
-			else pixels_cnt[x][y]--;
-		}
-		else {
-			pixels_cnt[x][y] = 1;
-			pixels[x][y] = color;
-		}
+		setPoints_pixels(x, y, color);
 	}
+}
+void setPoints_pixels(Point p, Color color) {
+	setPoints_pixels(p.pnt[0], p.pnt[1], color);
+}
+void setPoints_pixels(int x, int y, Color color) {
+	//for (int i = 0; i < testp.size(); i++) {
+	//	if (x == testp[i].pnt[0] && y == testp[i].pnt[1]) {
+	//		std::cout << "start x" << x << " y" << y << " cnt" << pixels_cnt[x][y] << " color " << pixels[x][y].color[0]\
+	//			<< " " << pixels[x][y].color[1] << " " << pixels[x][y].color[2] << "\n";
+	//		break;
+	//	}
+	//}
+	if (color == g_redColor&&pixels[x][y] == g_defColor) {
+		//testp.push_back(Point(x, y));
+		pixels_cnt[x][y] = pixels_cnt[x][y] * 100 + 1;
+		pixels[x][y] = g_redColor;
+		//std::cout << "start x" << x << " y" << y << " cnt" << pixels_cnt[x][y] << " color " << pixels[x][y].color[0]\
+		//	<< " " << pixels[x][y].color[1] << " " << pixels[x][y].color[2] << "\n";
+	}
+	else if (color == g_blackColor&&pixels[x][y] == g_redColor) {
+		if (pixels_cnt[x][y] % 100 == 1) {
+			if (pixels_cnt[x][y] >= 100) {
+				pixels[x][y] = g_defColor;
+				pixels_cnt[x][y] /= 100;
+			}
+			else {
+				pixels[x][y] = g_blackColor;
+			}
+		}
+		else pixels_cnt[x][y]--;
+	}
+	else if (pixels[x][y] == color) pixels_cnt[x][y]++;
+	else if (color == g_blackColor) {
+		if (pixels_cnt[x][y] == 1) pixels[x][y] = color;
+		else pixels_cnt[x][y]--;
+	}
+	else {
+		pixels_cnt[x][y] = 1;
+		pixels[x][y] = color;
+	}
+	//for (int i = 0; i < testp.size(); i++) {
+	//	if (x == testp[i].pnt[0] && y == testp[i].pnt[1]) {
+	//		std::cout << "start x" << x << " y" << y << " cnt" << pixels_cnt[x][y] << " color " << pixels[x][y].color[0]\
+	//			<< " " << pixels[x][y].color[1] << " " << pixels[x][y].color[2] << "\n";
+	//		break;
+	//	}
+	//}
+}
+void clear() {
+	vec.clear();
+	initPixels();
+	mode = mode_PENCIL;
+}
+void vec_init() {
+	vec.push_back(new Lines);
 }

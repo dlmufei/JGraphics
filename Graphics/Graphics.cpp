@@ -6,7 +6,6 @@
 #define MAX_LOADSTRING 100
 #pragma comment(lib, "opengl32.lib")
 #pragma comment(lib, "glu32.lib")
-
 // 全局变量: 
 HINSTANCE hInst;                                // 当前实例
 WCHAR szTitle[MAX_LOADSTRING];                  // 标题栏文本
@@ -57,7 +56,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     UNREFERENCED_PARAMETER(lpCmdLine);
 
     // TODO: 在此放置代码。
-	vec.push_back(new Lines);
+	vec_init();
 	
     // 初始化全局字符串
     LoadStringW(hInstance, IDS_APP_TITLE, szTitle, MAX_LOADSTRING);
@@ -162,9 +161,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     switch (message)
     {
 	case WM_CREATE:
-		//AllocConsole();
-
-		//freopen("conout$", "w", stdout);
+		AllocConsole();
+		freopen("conout$", "w", stdout);
 		
 		GetClientRect(hWnd, &g_clientRect);
 		g_cliWidth = g_clientRect.right - g_clientRect.left;
@@ -180,6 +178,10 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             int wmId = LOWORD(wParam);
 			if (mode == mode_CUBE) {
 				cube.finish();
+			}
+			else if (mode == mode_CUT_IN2 || mode == mode_CUT_OUT2) {
+				vec[vec.size() - 1]->clear();
+				vec.pop_back();
 			}
             // 分析菜单选择: 
             switch (wmId)
@@ -251,8 +253,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 				saveFile();
 				break;
 			case ID_CLEAR:
-				vec.clear();
-				initPixels();
+				clear();
+				vec_init();
 				break;
             default:
                 return DefWindowProc(hWnd, message, wParam, lParam);
@@ -401,7 +403,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			case mode_MOVE:
 			{
 				Point p(LOWORD(lParam), g_clientRect.bottom - HIWORD(lParam));
-				((Polygons*)vec[vec.size() - 1])->move(p.pnt[0] - lastPoint.pnt[0], p.pnt[1] - lastPoint.pnt[1]);
+				((Polygons*)vec[vec.size() - 1])->move((int)round(p.pnt[0] - lastPoint.pnt[0]), (int)round(p.pnt[1] - lastPoint.pnt[1]));
 				lastPoint = p;
 				break;
 			}

@@ -12,7 +12,7 @@ public:
 		glColor3fv(m_color.color);
 		for (int i = 0; i != m_points.size(); ++i)
 		{
-			glVertex2iv(m_points[i].pnt);
+			glVertex2fv(m_points[i].pnt);
 		}
 		glEnd();
 	}
@@ -26,14 +26,14 @@ public:
 		m_width = width;
 	};
 	void update() {
-		for (int i = 1; i < m_points.size(); i++) {
+		for (unsigned int i = 1; i < m_points.size(); i++) {
 			std::vector<Point> *tmp_points = getPoints(m_points[i - 1], m_points[i]);
 			setPoints_pixels(tmp_points, g_defColor);
 		}
 	}
-	int* output() {
+	float* output() {
 		int size = m_points.size();
-		int* output = new int[2 * size + 2];
+		float* output = new float[2 * size + 2];
 		output[0] = 2 * size + 2;
 		output[1] = type;
 		for (int i = 0; i < size; i++) {
@@ -42,7 +42,7 @@ public:
 		}
 		return output;
 	}
-	void input(int *input, int size) {
+	void input(float *input, int size) {
 		int cnt = (size - 2) / 2;
 		m_points.clear();
 		for (int i = 0; i < cnt; i++) {
