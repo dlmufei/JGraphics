@@ -92,6 +92,6 @@
     </Image>
   </ItemGroup>
   <ItemGroup>
-    <Text Include="ReadMe.md" />
+    <None Include="..\README.md" />
   </ItemGroup>
 </Project>
